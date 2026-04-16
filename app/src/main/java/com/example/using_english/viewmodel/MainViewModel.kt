@@ -114,8 +114,10 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
 
     private fun calculateSessionSummary(exerciseId: String) {
         viewModelScope.launch {
-            // El blockId es el prefijo común, ej: "C1A4-T1-P1" de "C1A4-T1-P1-Q1"
-            val blockId = exerciseId.substringBeforeLast("-")
+            // Obtenemos el ID del Test (ej: "C1A4-T1") para contar las 42 preguntas del examen
+            val parts = exerciseId.split("-")
+            val blockId = if (parts.size >= 2) parts.take(2).joinToString("-") else exerciseId
+            
             val allQuestionsInPart = repository.getExercisesByBlock(blockId)
             
             val level = if (exerciseId.startsWith("C1")) "C1" else "B2"
@@ -131,22 +133,22 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
                 )
             }
             
-            val percentage = (correct.toFloat() / total.toFloat() * 100).toInt()
+            val percentage = if (total > 0) (correct.toFloat() / total.toFloat() * 100).toInt() else 0
             
-            // Cambridge English Scale mapping (approximate for Use of English)
+            // Cambridge English Scale mapping (Basado en examen completo de ~42 preguntas)
             val (score, grade) = when (level) {
                 "C1" -> when {
-                    percentage >= 80 -> (190 + (percentage - 80) * 1) to "Grade A (C2 Level)"
-                    percentage >= 75 -> (180 + (percentage - 75) * 2) to "Grade B (C1 Level)"
-                    percentage >= 60 -> (160 + (percentage - 60) * 1.3).toInt() to "Grade C (C1 Level)"
-                    percentage >= 45 -> (142 + (percentage - 45) * 1.2).toInt() to "B2 Level"
+                    percentage >= 80 -> (200 + (percentage - 80) * 0.5).toInt() to "Grade A (C2 Level)"
+                    percentage >= 75 -> (193 + (percentage - 75) * 1.4).toInt() to "Grade B (C1 Level)"
+                    percentage >= 60 -> (180 + (percentage - 60) * 0.86).toInt() to "Grade C (C1 Level)"
+                    percentage >= 45 -> (160 + (percentage - 45) * 1.33).toInt() to "B2 Level"
                     else -> (120 + percentage) to "Below B2"
                 }
                 else -> when { // B2
-                    percentage >= 80 -> (180 + (percentage - 80) * 1) to "Grade A (C1 Level)"
+                    percentage >= 80 -> (180 + (percentage - 80) * 0.5).toInt() to "Grade A (C1 Level)"
                     percentage >= 75 -> (173 + (percentage - 75) * 1.4).toInt() to "Grade B (B2 Level)"
-                    percentage >= 60 -> (160 + (percentage - 60) * 0.8).toInt() to "Grade C (B2 Level)"
-                    percentage >= 45 -> (140 + (percentage - 45) * 1.3).toInt() to "B1 Level"
+                    percentage >= 60 -> (160 + (percentage - 60) * 0.86).toInt() to "Grade C (B2 Level)"
+                    percentage >= 45 -> (140 + (percentage - 45) * 1.33).toInt() to "B1 Level"
                     else -> (120 + percentage) to "Below B1"
                 }
             }

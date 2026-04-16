@@ -32,7 +32,7 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises WHERE level = :level AND exerciseNumber = :exerciseNumber ORDER BY questionNumber ASC")
     suspend fun getExercisesByPart(level: String, exerciseNumber: Int): List<ExerciseEntity>
 
-    @Query("SELECT * FROM exercises WHERE exercise LIKE :blockId || '%' ORDER BY questionNumber ASC")
+    @Query("SELECT * FROM exercises WHERE exercise LIKE :blockId || '-%' ORDER BY exercise, questionNumber ASC")
     suspend fun getExercisesByBlock(blockId: String): List<ExerciseEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
