@@ -86,27 +86,33 @@ class ExerciseRepository(
                         // Process exercises to add sequence numbers
                         val level = if (fileName.contains("c1")) "C1" else "B2"
                         
-                        // Group by "Block" (Book + Test + Part)
-                        // Example ID: C1A4-T1-P1-Q1 -> Block: C1A4-T1-P1
-                        val groupedByBlock = rawExercises.groupBy { 
-                            val parts = it.exercise.split("-")
-                            if (parts.size >= 3) parts.subList(0, 3).joinToString("-") else it.exercise
-                        }
-
-                        var exerciseCounter = 1
                         val processedExercises = mutableListOf<ExerciseEntity>()
 
-                        groupedByBlock.forEach { (_, questions) ->
-                            questions.forEachIndexed { index, q ->
-                                processedExercises.add(
-                                    q.copy(
-                                        level = level,
-                                        exerciseNumber = exerciseCounter,
-                                        questionNumber = index + 1
-                                    )
-                                )
+                        rawExercises.forEach { q ->
+                            val parts = q.exercise.split("-")
+                            // ID format: C1A4-T1-P1-Q1 or B2F5-T1-P3-Q1
+                            
+                            var partNum = parts.getOrNull(2)?.removePrefix("P")?.toIntOrNull() ?: 0
+                            val questNum = parts.getOrNull(3)?.removePrefix("Q")?.toIntOrNull() ?: 0
+
+                            // AUTO-CORRECTION for B2 JSON error (where everything is P3)
+                            if (level == "B2" && partNum == 3) {
+                                partNum = when {
+                                    questNum in 1..8 -> 1
+                                    questNum in 9..16 -> 2
+                                    questNum in 17..24 -> 3
+                                    questNum in 25..30 -> 4
+                                    else -> 3 // Fallback
+                                }
                             }
-                            exerciseCounter++
+
+                            processedExercises.add(
+                                q.copy(
+                                    level = level,
+                                    exerciseNumber = partNum,
+                                    questionNumber = questNum
+                                )
+                            )
                         }
                         
                         // Only add exercises that don't already exist in the DB

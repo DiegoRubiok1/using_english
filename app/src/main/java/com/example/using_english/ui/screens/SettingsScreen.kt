@@ -117,7 +117,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW,
-                        "https://github.com/DiegoRubiok1/using-english".toUri())
+                        "https://github.com/DiegoRubiok1/using_english".toUri())
                     context.startActivity(intent)
                 }
             ) {
