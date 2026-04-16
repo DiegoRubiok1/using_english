@@ -1,5 +1,6 @@
 package com.example.using_english.ui.screens
 
+import com.example.using_english.data.ExerciseEntity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -71,8 +72,7 @@ fun ExerciseDetailScreen(
 
     Scaffold(
         topBar = {
-            val baseTitle = exercise?.exercise?.let { formatExerciseTitle(it) } ?: "Loading..."
-            val title = if (gapText != null) "$baseTitle ($gapText)" else baseTitle
+            val title = if (gapText != null) "${formatExerciseTitle(exercise)} ($gapText)" else formatExerciseTitle(exercise)
 
             TopAppBar(
                 title = { Text(title) },
@@ -337,18 +337,9 @@ fun ResultDialog(
 }
 
 
-fun formatExerciseTitle(rawId: String): String {
-    // Example format: C1A4-T1-P1-Q1
-    val parts = rawId.split("-")
-    return if (parts.size >= 4) {
-        val section = parts[0] // C1A4
-        parts[1].removePrefix("T") // 1
-        val part = parts[2].removePrefix("P") // 1
-        val question = parts[3].removePrefix("Q") // 1
-        "Section $section, Part $part, Question $question"
-    } else {
-        rawId
-    }
+fun formatExerciseTitle(exercise: ExerciseEntity?): String {
+    if (exercise == null) return "Loading..."
+    return "Part ${exercise.exerciseNumber}, Question ${exercise.questionNumber}"
 }
 
 

@@ -14,5 +14,10 @@ data class ExerciseEntity(
     val exercise_type: String,
     val confidence: Double,
     val isResolved: Boolean = false,
-    val lastAttemptedAnswer: String? = null
+    val lastAttemptedAnswer: String? = null,
+    
+    // New fields for logical grouping and numbering
+    val level: String = "",           // e.g., "C1" or "B2"
+    val exerciseNumber: Int = 0,      // Sequential number of the block (Part) per level
+    val questionNumber: Int = 0       // Sequential number of the gap within that block
 )

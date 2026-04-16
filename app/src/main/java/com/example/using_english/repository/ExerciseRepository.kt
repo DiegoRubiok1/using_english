@@ -64,13 +64,39 @@ class ExerciseRepository(
                             .bufferedReader()
                             .use { it.readText() }
                         
-                        val exercises: List<ExerciseEntity> = gson.fromJson(jsonString, listType)
+                        val rawExercises: List<ExerciseEntity> = gson.fromJson(jsonString, listType)
+                        
+                        // Process exercises to add sequence numbers
+                        val level = if (fileName.contains("c1")) "C1" else "B2"
+                        
+                        // Group by "Block" (Book + Test + Part)
+                        // Example ID: C1A4-T1-P1-Q1 -> Block: C1A4-T1-P1
+                        val groupedByBlock = rawExercises.groupBy { 
+                            val parts = it.exercise.split("-")
+                            if (parts.size >= 3) parts.subList(0, 3).joinToString("-") else it.exercise
+                        }
+
+                        var exerciseCounter = 1
+                        val processedExercises = mutableListOf<ExerciseEntity>()
+
+                        groupedByBlock.forEach { (_, questions) ->
+                            questions.forEachIndexed { index, q ->
+                                processedExercises.add(
+                                    q.copy(
+                                        level = level,
+                                        exerciseNumber = exerciseCounter,
+                                        questionNumber = index + 1
+                                    )
+                                )
+                            }
+                            exerciseCounter++
+                        }
                         
                         // Only add exercises that don't already exist in the DB
-                        val newExercises = exercises.filter { it.exercise !in existingExercises }
+                        val newExercises = processedExercises.filter { it.exercise !in existingExercises }
                         if (newExercises.isNotEmpty()) {
                             allLoadedExercises.addAll(newExercises)
-                            android.util.Log.d("ExerciseRepository", "Found ${newExercises.size} new exercises in $fileName")
+                            android.util.Log.d("ExerciseRepository", "Found ${newExercises.size} new exercises in $fileName ($level)")
                         }
                     } catch (e: Exception) {
                         android.util.Log.e("ExerciseRepository", "Error loading $fileName", e)

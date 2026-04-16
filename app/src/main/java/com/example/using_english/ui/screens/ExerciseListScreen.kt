@@ -106,7 +106,7 @@ fun ExerciseCard(exercise: ExerciseEntity, onExerciseSelected: (String) -> Unit)
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = formatExerciseTitle(exercise.exercise),
+                    text = "Part ${exercise.exerciseNumber}, Question ${exercise.questionNumber}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
