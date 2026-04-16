@@ -114,7 +114,7 @@ fun SessionSummaryDialog(
         title = { 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Study Session Complete!", style = MaterialTheme.typography.headlineSmall)
-                Text("Part ${summary.level} Results", style = MaterialTheme.typography.bodyMedium)
+                Text("Test Results", style = MaterialTheme.typography.bodyMedium)
             }
         },
         text = {
@@ -165,6 +165,11 @@ fun ScoreStat(label: String, value: String, color: Color) {
 
 @Composable
 fun ExerciseCard(exercise: ExerciseEntity, onExerciseSelected: (String) -> Unit) {
+    // Extraemos Test y Part del ID del ejercicio (ej: C1A4-T1-P2-Q1 -> T1, P2)
+    val idParts = exercise.exercise.split("-")
+    val testName = idParts.getOrNull(1) ?: "T?"
+    val partName = idParts.getOrNull(2) ?: "P?"
+
     val statusColor = when {
         exercise.isResolved -> Color(0xFF4CAF50) // Positive - Solved
         exercise.lastAttemptedAnswer != null -> Color(0xFFF44336) // Negative - Attempted
@@ -195,7 +200,7 @@ fun ExerciseCard(exercise: ExerciseEntity, onExerciseSelected: (String) -> Unit)
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Part ${exercise.exerciseNumber}, Question ${exercise.questionNumber}",
+                    text = "Test ${testName.removePrefix("T")}, Part ${partName.removePrefix("P")}, Question ${exercise.questionNumber}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
