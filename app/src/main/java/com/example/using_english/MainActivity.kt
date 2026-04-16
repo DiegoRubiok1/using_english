@@ -168,7 +168,10 @@ fun Using_englishApp(viewModel: MainViewModel) {
                     )
                 }
                 composable(Screen.Settings.route) {
-                    SettingsScreen(viewModel)
+                    SettingsScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() }
+                    )
                 }
             }
         }
