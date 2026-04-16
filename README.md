@@ -4,6 +4,19 @@ Using English is a modern Android application designed to help prepare for the E
 The app focuses on the "Use of English" section, providing interactive exercises and progress 
 tracking.
 
+
+# How it looks
+
+<p align="center">
+<img width="20%" height="2400" alt="image" src="https://github.com/user-attachments/assets/db0345fb-73c6-4a20-9e76-84a5b37386d7" />
+
+<img width="20%" height="2400" alt="image" src="https://github.com/user-attachments/assets/ae24dd9d-06e3-442a-8327-858dc5713aaa" />
+
+<img width="20%" height="2400" alt="image" src="https://github.com/user-attachments/assets/e8bd52da-b4ca-468e-9df1-ee2dcda379d8" />
+
+<img width="20%" height="2400" alt="image" src="https://github.com/user-attachments/assets/4dc51505-5218-4ea6-9fbc-289cd1bc735b" />
+</p>
+
 ## AI disclaimer
 This project is built by someone with **NO** experience in Kotlin or Android development. It is 
 expected to have failures since the code itself was all generated, only being supervised by me.
