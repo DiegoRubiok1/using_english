@@ -2,17 +2,35 @@ package com.example.using_english.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "exercises")
 data class ExerciseEntity(
-    @PrimaryKey val exercise: String, // e.g., "C1A4-T1-P1-Q1"
+    @PrimaryKey 
+    @SerializedName("exercise")
+    val exercise: String, // e.g., "C1A4-T1-P1-Q1"
+    
+    @SerializedName("prompt")
     val prompt: String,
+    
+    @SerializedName("options")
     val options: List<String>,
+    
+    @SerializedName("solution")
     val solution: String,
+    
+    @SerializedName("source_file")
     val source_file: String,
+    
+    @SerializedName("page")
     val page: Int,
+    
+    @SerializedName("exercise_type")
     val exercise_type: String,
+    
+    @SerializedName("confidence")
     val confidence: Double,
+
     val isResolved: Boolean = false,
     val lastAttemptedAnswer: String? = null,
     
