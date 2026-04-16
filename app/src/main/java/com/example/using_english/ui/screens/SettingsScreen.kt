@@ -149,7 +149,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
-                            text = "1.2.0-beta (C1/B2 Support)",
+                            text = "1.2.1-beta (C1/B2 Support)",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
