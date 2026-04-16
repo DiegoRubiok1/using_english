@@ -107,14 +107,18 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
             
             // Si no hay siguiente, calculamos el resumen de la parte
             if (next == null) {
-                calculateSessionSummary(exercise.level, exercise.exerciseNumber)
+                calculateSessionSummary(exercise.exercise)
             }
         }
     }
 
-    private fun calculateSessionSummary(level: String, exerciseNumber: Int) {
+    private fun calculateSessionSummary(exerciseId: String) {
         viewModelScope.launch {
-            val allQuestionsInPart = repository.getExercisesByPart(level, exerciseNumber)
+            // El blockId es el prefijo común, ej: "C1A4-T1-P1" de "C1A4-T1-P1-Q1"
+            val blockId = exerciseId.substringBeforeLast("-")
+            val allQuestionsInPart = repository.getExercisesByBlock(blockId)
+            
+            val level = if (exerciseId.startsWith("C1")) "C1" else "B2"
             val correct = allQuestionsInPart.count { it.isResolved }
             val total = allQuestionsInPart.size
             

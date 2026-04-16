@@ -43,6 +43,10 @@ class ExerciseRepository(
         exerciseDao.getExercisesByPart(level, exerciseNumber)
     }
 
+    suspend fun getExercisesByBlock(blockId: String): List<ExerciseEntity> = withContext(Dispatchers.IO) {
+        exerciseDao.getExercisesByBlock(blockId)
+    }
+
     suspend fun updateExercise(exercise: ExerciseEntity) = withContext(Dispatchers.IO) {
         exerciseDao.updateExercise(exercise)
     }
