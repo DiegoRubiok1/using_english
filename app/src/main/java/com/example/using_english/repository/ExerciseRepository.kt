@@ -121,9 +121,14 @@ class ExerciseRepository(
                 }
 
                 if (allLoadedExercises.isNotEmpty()) {
-                    android.util.Log.d("ExerciseRepository", "Inserting total ${allLoadedExercises.size} new exercises...")
-                    exerciseDao.insertAll(allLoadedExercises)
+                    android.util.Log.d("ExerciseRepository", "Inserting total ${allLoadedExercises.size} new exercises in chunks...")
+                    // Insertar en trozos de 100 para evitar problemas de memoria en dispositivos reales
+                    allLoadedExercises.chunked(100).forEach { chunk ->
+                        exerciseDao.insertAll(chunk)
+                    }
                     android.util.Log.d("ExerciseRepository", "Insertion complete")
+                } else {
+                    android.util.Log.d("ExerciseRepository", "No new exercises to insert")
                 }
 
                 // Initialize stats if not present
