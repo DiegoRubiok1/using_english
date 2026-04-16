@@ -51,6 +51,11 @@ class ExerciseRepository(
         exerciseDao.insertUserStats(stats)
     }
 
+    suspend fun resetAllData() = withContext(Dispatchers.IO) {
+        exerciseDao.resetAllProgress()
+        exerciseDao.resetUserStats()
+    }
+
     suspend fun checkAndPrepopulateDatabase() {
         withContext(Dispatchers.IO) {
             try {

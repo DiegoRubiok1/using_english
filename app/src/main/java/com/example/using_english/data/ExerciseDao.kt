@@ -47,4 +47,10 @@ interface ExerciseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserStats(stats: UserStatsEntity)
+
+    @Query("UPDATE exercises SET isResolved = 0, lastAttemptedAnswer = NULL")
+    suspend fun resetAllProgress()
+
+    @Query("UPDATE user_stats SET totalResolved = 0 WHERE id = 0")
+    suspend fun resetUserStats()
 }

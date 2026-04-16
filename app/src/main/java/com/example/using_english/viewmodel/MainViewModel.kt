@@ -33,6 +33,12 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
         }
     }
 
+    fun resetAllData() {
+        viewModelScope.launch {
+            repository.resetAllData()
+        }
+    }
+
     fun getExercises(level: String, category: String): Flow<List<ExerciseEntity>> {
         return repository.getExercisesByLevelAndCategory(level, category)
     }

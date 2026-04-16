@@ -2,37 +2,53 @@ package com.example.using_english.ui.screens
 
 import android.content.Intent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.example.using_english.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: MainViewModel) {
-    val isBlackTheme by viewModel.isBlackTheme.collectAsState()
+fun SettingsScreen(
+    viewModel: MainViewModel,
+    onBack: () -> Unit
+) {
+    val userStats by viewModel.userStats.collectAsState(initial = null)
     val context = LocalContext.current
+    var showResetDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Settings") })
+            TopAppBar(
+                title = { Text("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Appearance",
+                text = "Preferences",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -47,29 +63,23 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Brightness4, contentDescription = null)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.DarkMode, contentDescription = null)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
-                            Text(
-                                text = "Pure Black Theme",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = "Use true black for dark mode (OLED)",
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            Text(text = "OLED Black Theme", style = MaterialTheme.typography.bodyLarge)
+                            Text(text = "Pure black for OLED screens", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                     Switch(
-                        checked = isBlackTheme,
+                        checked = userStats?.isBlackTheme ?: false,
                         onCheckedChange = { viewModel.setBlackTheme(it) }
                     )
                 }
             }
 
             Text(
-                text = "About & Updates",
+                text = "Project",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -77,7 +87,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW,
+                    val intent = Intent(Intent.ACTION_VIEW, 
                         "https://github.com/DiegoRubiok1/using-english/releases".toUri())
                     context.startActivity(intent)
                 }
@@ -88,7 +98,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.SystemUpdate, contentDescription = null)
+                    Icon(Icons.Default.Update, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
@@ -96,7 +106,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
-                            text = "Download the latest version from GitHub",
+                            text = "Current: 1.2.1-beta",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -132,6 +142,45 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 }
             }
 
+            Text(
+                text = "Maintenance",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { showResetDialog = true },
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.DeleteForever, 
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = "Clear Database",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Text(
+                            text = "Delete all progress and start over",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -145,7 +194,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Version",
+                            text = "App Version",
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
@@ -156,5 +205,29 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 }
             }
         }
+    }
+
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Clear All Progress?") },
+            text = { Text("This will reset all your answered questions and statistics. This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.resetAllData()
+                        showResetDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Reset Everything")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
