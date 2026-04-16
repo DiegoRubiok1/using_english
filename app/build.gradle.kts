@@ -12,15 +12,31 @@ android {
         applicationId = "com.example.using_english"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.2.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            // Usamos la firma de debug por defecto para que sea instalable sin errores
+            // pero en modo Release (optimizado)
+            val debugKeyStore = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            if (debugKeyStore.exists()) {
+                storeFile = debugKeyStore
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true // Habilitamos optimización
+            isShrinkResources = true // Quitamos recursos no usados
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

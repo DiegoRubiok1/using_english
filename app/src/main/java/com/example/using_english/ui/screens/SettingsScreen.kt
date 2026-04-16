@@ -1,19 +1,17 @@
 package com.example.using_english.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Brightness4
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.ui.platform.LocalContext
-import android.content.Intent
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.using_english.viewmodel.MainViewModel
 import androidx.core.net.toUri
+import com.example.using_english.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,10 +69,39 @@ fun SettingsScreen(viewModel: MainViewModel) {
             }
 
             Text(
-                text = "About",
+                text = "About & Updates",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW,
+                        "https://github.com/DiegoRubiok1/using-english/releases".toUri())
+                    context.startActivity(intent)
+                }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.SystemUpdate, contentDescription = null)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = "Check for Updates",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Download the latest version from GitHub",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
