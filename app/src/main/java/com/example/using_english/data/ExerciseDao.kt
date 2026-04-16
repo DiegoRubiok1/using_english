@@ -21,13 +21,13 @@ interface ExerciseDao {
     @Query("""
         SELECT * FROM exercises 
         WHERE isResolved = 0 
-        AND exercise_type = (SELECT exercise_type FROM exercises WHERE exercise = :currentId)
         AND exercise LIKE :levelPrefix || '%' 
-        AND exercise > :currentId 
-        ORDER BY exercise ASC 
+        AND exerciseNumber = :exerciseNumber
+        AND questionNumber > :currentQuestionNumber
+        ORDER BY questionNumber ASC 
         LIMIT 1
     """)
-    suspend fun getNextUnresolvedExercise(levelPrefix: String, currentId: String): ExerciseEntity?
+    suspend fun getNextUnresolvedExerciseInPart(levelPrefix: String, exerciseNumber: Int, currentQuestionNumber: Int): ExerciseEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(exercises: List<ExerciseEntity>)

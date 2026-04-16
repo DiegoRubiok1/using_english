@@ -32,7 +32,11 @@ class ExerciseRepository(
     }
 
     suspend fun getNextUnresolvedExercise(levelPrefix: String, currentId: String): ExerciseEntity? = withContext(Dispatchers.IO) {
-        exerciseDao.getNextUnresolvedExercise(levelPrefix, currentId)
+        null // Legacy
+    }
+
+    suspend fun getNextUnresolvedExerciseInPart(levelPrefix: String, exerciseNumber: Int, questionNumber: Int): ExerciseEntity? = withContext(Dispatchers.IO) {
+        exerciseDao.getNextUnresolvedExerciseInPart(levelPrefix, exerciseNumber, questionNumber)
     }
 
     suspend fun updateExercise(exercise: ExerciseEntity) = withContext(Dispatchers.IO) {

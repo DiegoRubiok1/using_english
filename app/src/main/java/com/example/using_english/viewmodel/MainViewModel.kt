@@ -51,8 +51,8 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
             
             exercise?.let {
                 val levelPrefix = it.exercise.takeWhile { char -> char != '-' }
-                // Look specifically for the next unresolved exercise FORWARD in the list
-                val next = repository.getNextUnresolvedExercise(levelPrefix, it.exercise)
+                // Buscamos la siguiente pregunta NO RESUELTA con un questionNumber estrictamente superior
+                val next = repository.getNextUnresolvedExerciseInPart(levelPrefix, it.exerciseNumber, it.questionNumber)
                 _nextExerciseId.value = next?.exercise
             }
         }
@@ -73,8 +73,8 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
             }
             
             val levelPrefix = exercise.exercise.takeWhile { char -> char != '-' }
-            // Always refresh based on current exercise position
-            val next = repository.getNextUnresolvedExercise(levelPrefix, exercise.exercise)
+            // Buscamos la siguiente de la misma forma tras responder
+            val next = repository.getNextUnresolvedExerciseInPart(levelPrefix, exercise.exerciseNumber, exercise.questionNumber)
             _nextExerciseId.value = next?.exercise
         }
     }

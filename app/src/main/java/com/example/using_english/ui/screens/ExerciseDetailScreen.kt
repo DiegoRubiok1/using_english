@@ -184,7 +184,13 @@ fun ExerciseDetailScreen(
                         isCorrect = isCorrect,
                         solution = ex.solution,
                         nextExerciseId = nextExerciseId,
-                        onDismiss = { showResultDialog = false },
+                        onDismiss = { 
+                            showResultDialog = false 
+                            // Si es la última pregunta de la parte, volvemos a la lista
+                            if (nextExerciseId == null) {
+                                onBack()
+                            }
+                        },
                         onNextExercise = { id ->
                             viewModel.loadExercise(id)
                             showResultDialog = false
@@ -327,7 +333,7 @@ fun ResultDialog(
                                 contentColor = backgroundColor
                             )
                         ) {
-                            Text("Close")
+                            Text("Finish Part")
                         }
                     }
                 }
