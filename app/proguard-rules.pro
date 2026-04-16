@@ -1,5 +1,5 @@
 # Room rules
--keepdeclarationmembers class * extends androidx.room.RoomDatabase {
+-keepclassmembers class * extends androidx.room.RoomDatabase {
     <init>(...);
 }
 -keep class * extends androidx.room.RoomDatabase
