@@ -25,7 +25,7 @@ fun ExercisesScreen(onLevelSelected: (String) -> Unit) {
         LevelItem("A1", Color(0xFF4CAF50)),
         LevelItem("A2", Color(0xFF8BC34A)),
         LevelItem("B1", Color(0xFFFFC107)),
-        LevelItem("B2", Color(0xFFFF9800)),
+        LevelItem("B2", Color(0xFFFF9800), enabled = true),
         LevelItem("C1", Color(0xFFF44336), enabled = true),
         LevelItem("C2", Color(0xFFB71C1C))
     )

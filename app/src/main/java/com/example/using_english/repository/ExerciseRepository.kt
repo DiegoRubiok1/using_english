@@ -20,7 +20,7 @@ class ExerciseRepository(
     
     fun getExercisesByLevelAndCategory(level: String, category: String): Flow<List<ExerciseEntity>> {
         val categories = if (category == "Use of English") {
-            listOf("Multiple-choice cloze", "Open cloze", "Word formation")
+            listOf("Multiple-choice cloze", "Open cloze", "Word formation", "Key word transformation")
         } else {
             listOf(category)
         }
@@ -48,44 +48,49 @@ class ExerciseRepository(
             try {
                 android.util.Log.d("ExerciseRepository", "Checking database...")
                 val currentExercises = allExercises.first()
-                android.util.Log.d("ExerciseRepository", "Database contains ${currentExercises.size} exercises")
-                if (currentExercises.isEmpty()) {
-                    android.util.Log.d("ExerciseRepository", "Prepopulating from JSON...")
-                    val jsonString = try {
-                        context.assets.open("extracted_exercises.json")
+                
+                // Identify what's currently in the DB
+                val existingExercises = currentExercises.map { it.exercise }.toSet()
+
+                val assetFiles = listOf("extracted_exercises_c1.json", "extracted_exercises_b2.json")
+                val allLoadedExercises = mutableListOf<ExerciseEntity>()
+                val gson = Gson()
+                val listType = object : TypeToken<List<ExerciseEntity>>() {}.type
+
+                for (fileName in assetFiles) {
+                    try {
+                        android.util.Log.d("ExerciseRepository", "Checking $fileName...")
+                        val jsonString = context.assets.open(fileName)
                             .bufferedReader()
                             .use { it.readText() }
+                        
+                        val exercises: List<ExerciseEntity> = gson.fromJson(jsonString, listType)
+                        
+                        // Only add exercises that don't already exist in the DB
+                        val newExercises = exercises.filter { it.exercise !in existingExercises }
+                        if (newExercises.isNotEmpty()) {
+                            allLoadedExercises.addAll(newExercises)
+                            android.util.Log.d("ExerciseRepository", "Found ${newExercises.size} new exercises in $fileName")
+                        }
                     } catch (e: Exception) {
-                        android.util.Log.e("ExerciseRepository", "Error reading assets file", e)
-                        throw e
+                        android.util.Log.e("ExerciseRepository", "Error loading $fileName", e)
                     }
-                    
-                    val listType = object : TypeToken<List<ExerciseEntity>>() {}.type
-                    val exercises: List<ExerciseEntity> = try {
-                        Gson().fromJson(jsonString, listType)
-                    } catch (e: Exception) {
-                        android.util.Log.e("ExerciseRepository", "Error parsing JSON content", e)
-                        throw e
-                    }
-                    
-                    android.util.Log.d("ExerciseRepository", "Parsed ${exercises.size} exercises. Inserting...")
-                    if (exercises.isNotEmpty()) {
-                        exerciseDao.insertAll(exercises)
-                        android.util.Log.d("ExerciseRepository", "Insertion complete")
-                    } else {
-                        android.util.Log.w("ExerciseRepository", "No exercises found in JSON!")
-                    }
-                    
-                    // Initialize stats if not present
-                    val currentStats = userStats.first()
-                    if (currentStats == null) {
-                        android.util.Log.d("ExerciseRepository", "Initializing user stats...")
-                        exerciseDao.insertUserStats(UserStatsEntity())
-                    }
+                }
+
+                if (allLoadedExercises.isNotEmpty()) {
+                    android.util.Log.d("ExerciseRepository", "Inserting total ${allLoadedExercises.size} new exercises...")
+                    exerciseDao.insertAll(allLoadedExercises)
+                    android.util.Log.d("ExerciseRepository", "Insertion complete")
+                }
+
+                // Initialize stats if not present
+                val currentStats = userStats.first()
+                if (currentStats == null) {
+                    android.util.Log.d("ExerciseRepository", "Initializing user stats...")
+                    exerciseDao.insertUserStats(UserStatsEntity())
                 }
             } catch (e: Exception) {
                 android.util.Log.e("ExerciseRepository", "CRITICAL ERROR during prepopulation", e)
-                // Rethrow or handle safely. Currently MainViewModel catches it.
             }
         }
     }
