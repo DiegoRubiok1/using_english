@@ -6,9 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,7 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.example.using_english.data.ExerciseEntity
 import com.example.using_english.ui.theme.Using_englishTheme
 import com.example.using_english.viewmodel.MainViewModel
-import kotlinx.coroutines.flow.flowOf
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +36,7 @@ fun ExerciseListScreen(
     onBack: () -> Unit
 ) {
     val exercises by viewModel.getExercises(level, category).collectAsState(initial = emptyList())
+    val sessionSummary by viewModel.sessionSummary.collectAsState()
 
     Scaffold(
         topBar = {
@@ -47,30 +50,116 @@ fun ExerciseListScreen(
             )
         }
     ) { padding ->
-        when {
-            exercises.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Loading exercises...")
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            when {
+                exercises.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Loading exercises...")
+                        }
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(exercises) { exercise ->
+                            ExerciseCard(exercise, onExerciseSelected)
+                        }
                     }
                 }
             }
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(exercises) { exercise ->
-                        ExerciseCard(exercise, onExerciseSelected)
+
+            if (sessionSummary != null) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    SessionSummaryDialog(
+                        summary = sessionSummary!!,
+                        onDismiss = { viewModel.clearSessionSummary() }
+                    )
+                    
+                    if (sessionSummary!!.grade.contains("Grade A")) {
+                        KonfettiView(
+                            modifier = Modifier.fillMaxSize(),
+                            parties = listOf(
+                                Party(
+                                    speed = 0f,
+                                    maxSpeed = 30f,
+                                    damping = 0.9f,
+                                    spread = 360,
+                                    colors = listOf(0xfce18a, 0xff726d, 0xf42e33, 0x1fb711),
+                                    position = Position.Relative(0.5, 0.3),
+                                    emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100)
+                                )
+                            )
+                        )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SessionSummaryDialog(
+    summary: MainViewModel.SessionSummary,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(48.dp)) },
+        title = { 
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Study Session Complete!", style = MaterialTheme.typography.headlineSmall)
+                Text("Part ${summary.level} Results", style = MaterialTheme.typography.bodyMedium)
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    ScoreStat(label = "Correct", value = "${summary.correct}/${summary.total}", color = Color(0xFF4CAF50))
+                    ScoreStat(label = "Cambridge Score", value = summary.score.toString(), color = MaterialTheme.colorScheme.primary)
+                }
+
+                HorizontalDivider()
+
+                Text(
+                    text = summary.grade,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                Text(
+                    text = "Based on Cambridge English Scale standards.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                Text("Great!")
+            }
+        }
+    )
+}
+
+@Composable
+fun ScoreStat(label: String, value: String, color: Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = label, style = MaterialTheme.typography.labelMedium)
+        Text(text = value, style = MaterialTheme.typography.headlineMedium, color = color, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -121,58 +210,6 @@ fun ExerciseCard(exercise: ExerciseEntity, onExerciseSelected: (String) -> Unit)
             } else if (exercise.lastAttemptedAnswer != null) {
                 Icon(Icons.Default.Warning, contentDescription = "Attempted")
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ExerciseCardPreview() {
-    Using_englishTheme {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            ExerciseCard(
-                exercise = ExerciseEntity(
-                    exercise = "C1A4-T1-P1-Q1",
-                    prompt = "Sample prompt",
-                    options = listOf("A", "B", "C", "D"),
-                    solution = "D",
-                    source_file = "file.pdf",
-                    page = 10,
-                    exercise_type = "Multiple-choice cloze",
-                    confidence = 1.0,
-                    isResolved = false
-                ),
-                onExerciseSelected = {}
-            )
-            ExerciseCard(
-                exercise = ExerciseEntity(
-                    exercise = "C1A4-T1-P1-Q2",
-                    prompt = "Sample prompt",
-                    options = listOf("A", "B", "C", "D"),
-                    solution = "A",
-                    source_file = "file.pdf",
-                    page = 10,
-                    exercise_type = "Multiple-choice cloze",
-                    confidence = 1.0,
-                    isResolved = true
-                ),
-                onExerciseSelected = {}
-            )
-            ExerciseCard(
-                exercise = ExerciseEntity(
-                    exercise = "C1A4-T1-P1-Q3",
-                    prompt = "Sample prompt",
-                    options = listOf("A", "B", "C", "D"),
-                    solution = "B",
-                    source_file = "file.pdf",
-                    page = 10,
-                    exercise_type = "Multiple-choice cloze",
-                    confidence = 1.0,
-                    isResolved = false,
-                    lastAttemptedAnswer = "C"
-                ),
-                onExerciseSelected = {}
-            )
         }
     }
 }

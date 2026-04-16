@@ -39,6 +39,10 @@ class ExerciseRepository(
         exerciseDao.getNextUnresolvedExerciseInPart(levelPrefix, exerciseNumber, questionNumber)
     }
 
+    suspend fun getExercisesByPart(level: String, exerciseNumber: Int): List<ExerciseEntity> = withContext(Dispatchers.IO) {
+        exerciseDao.getExercisesByPart(level, exerciseNumber)
+    }
+
     suspend fun updateExercise(exercise: ExerciseEntity) = withContext(Dispatchers.IO) {
         exerciseDao.updateExercise(exercise)
     }

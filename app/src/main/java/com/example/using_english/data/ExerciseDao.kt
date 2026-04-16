@@ -29,6 +29,9 @@ interface ExerciseDao {
     """)
     suspend fun getNextUnresolvedExerciseInPart(levelPrefix: String, exerciseNumber: Int, currentQuestionNumber: Int): ExerciseEntity?
 
+    @Query("SELECT * FROM exercises WHERE level = :level AND exerciseNumber = :exerciseNumber ORDER BY questionNumber ASC")
+    suspend fun getExercisesByPart(level: String, exerciseNumber: Int): List<ExerciseEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(exercises: List<ExerciseEntity>)
 

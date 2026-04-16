@@ -43,6 +43,29 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
     private val _nextExerciseId = MutableStateFlow<String?>(null)
     val nextExerciseId: StateFlow<String?> = _nextExerciseId.asStateFlow()
 
+    private val _sessionSummary = MutableStateFlow<SessionSummary?>(null)
+    val sessionSummary: StateFlow<SessionSummary?> = _sessionSummary.asStateFlow()
+
+    fun clearSessionSummary() {
+        _sessionSummary.value = null
+    }
+
+    data class SessionSummary(
+        val correct: Int,
+        val total: Int,
+        val level: String,
+        val score: Int,
+        val grade: String,
+        val questions: List<QuestionResult>
+    )
+
+    data class QuestionResult(
+        val questionNumber: Int,
+        val isCorrect: Boolean,
+        val userAnswer: String,
+        val solution: String
+    )
+
     fun loadExercise(id: String) {
         viewModelScope.launch {
             val exercise = repository.getExerciseById(id)
@@ -73,9 +96,52 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
             }
             
             val levelPrefix = exercise.exercise.takeWhile { char -> char != '-' }
-            // Buscamos la siguiente de la misma forma tras responder
             val next = repository.getNextUnresolvedExerciseInPart(levelPrefix, exercise.exerciseNumber, exercise.questionNumber)
             _nextExerciseId.value = next?.exercise
+            
+            // Si no hay siguiente, calculamos el resumen de la parte
+            if (next == null) {
+                calculateSessionSummary(exercise.level, exercise.exerciseNumber)
+            }
+        }
+    }
+
+    private fun calculateSessionSummary(level: String, exerciseNumber: Int) {
+        viewModelScope.launch {
+            val allQuestionsInPart = repository.getExercisesByPart(level, exerciseNumber)
+            val correct = allQuestionsInPart.count { it.isResolved }
+            val total = allQuestionsInPart.size
+            
+            val questionResults = allQuestionsInPart.map {
+                QuestionResult(
+                    questionNumber = it.questionNumber,
+                    isCorrect = it.isResolved,
+                    userAnswer = it.lastAttemptedAnswer ?: "-",
+                    solution = it.solution
+                )
+            }
+            
+            val percentage = (correct.toFloat() / total.toFloat() * 100).toInt()
+            
+            // Cambridge English Scale mapping (approximate for Use of English)
+            val (score, grade) = when (level) {
+                "C1" -> when {
+                    percentage >= 80 -> (190 + (percentage - 80) * 1) to "Grade A (C2 Level)"
+                    percentage >= 75 -> (180 + (percentage - 75) * 2) to "Grade B (C1 Level)"
+                    percentage >= 60 -> (160 + (percentage - 60) * 1.3).toInt() to "Grade C (C1 Level)"
+                    percentage >= 45 -> (142 + (percentage - 45) * 1.2).toInt() to "B2 Level"
+                    else -> (120 + percentage) to "Below B2"
+                }
+                else -> when { // B2
+                    percentage >= 80 -> (180 + (percentage - 80) * 1) to "Grade A (C1 Level)"
+                    percentage >= 75 -> (173 + (percentage - 75) * 1.4).toInt() to "Grade B (B2 Level)"
+                    percentage >= 60 -> (160 + (percentage - 60) * 0.8).toInt() to "Grade C (B2 Level)"
+                    percentage >= 45 -> (140 + (percentage - 45) * 1.3).toInt() to "B1 Level"
+                    else -> (120 + percentage) to "Below B1"
+                }
+            }
+
+            _sessionSummary.value = SessionSummary(correct, total, level, score, grade, questionResults)
         }
     }
 
