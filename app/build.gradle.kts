@@ -18,25 +18,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        create("release") {
-            // Usamos la firma de debug por defecto para que sea instalable sin errores
-            // pero en modo Release (optimizado)
-            val debugKeyStore = file(System.getProperty("user.home") + "/.android/debug.keystore")
-            if (debugKeyStore.exists()) {
-                storeFile = debugKeyStore
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
-            }
-        }
-    }
-
     buildTypes {
         release {
-            isMinifyEnabled = true // Habilitamos optimización
-            isShrinkResources = true // Quitamos recursos no usados
-            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            // Usamos la firma de debug por defecto que Gradle genera automáticamente.
+            // Esto evita errores de "missing storeFile" y permite instalar el APK.
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
