@@ -333,7 +333,7 @@ fun ResultDialog(
                                 contentColor = backgroundColor
                             )
                         ) {
-                            Text("Finish Part")
+                            Text("Finish Test")
                         }
                     }
                 }
@@ -345,7 +345,10 @@ fun ResultDialog(
 
 fun formatExerciseTitle(exercise: ExerciseEntity?): String {
     if (exercise == null) return "Loading..."
-    return "Part ${exercise.exerciseNumber}, Question ${exercise.questionNumber}"
+    val idParts = exercise.exercise.split("-")
+    val testName = idParts.getOrNull(1)?.removePrefix("T") ?: "?"
+    val partName = idParts.getOrNull(2)?.removePrefix("P") ?: "?"
+    return "Test $testName, Part $partName, Question ${exercise.questionNumber}"
 }
 
 
