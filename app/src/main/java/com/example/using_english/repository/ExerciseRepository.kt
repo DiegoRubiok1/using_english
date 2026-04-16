@@ -31,6 +31,10 @@ class ExerciseRepository(
         exerciseDao.getExerciseById(id)
     }
 
+    suspend fun getNextUnresolvedExercise(levelPrefix: String, currentId: String): ExerciseEntity? = withContext(Dispatchers.IO) {
+        exerciseDao.getNextUnresolvedExercise(levelPrefix, currentId)
+    }
+
     suspend fun updateExercise(exercise: ExerciseEntity) = withContext(Dispatchers.IO) {
         exerciseDao.updateExercise(exercise)
     }

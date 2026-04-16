@@ -18,6 +18,17 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises WHERE exercise = :id")
     suspend fun getExerciseById(id: String): ExerciseEntity?
 
+    @Query("""
+        SELECT * FROM exercises 
+        WHERE isResolved = 0 
+        AND exercise_type = (SELECT exercise_type FROM exercises WHERE exercise = :currentId)
+        AND exercise LIKE :levelPrefix || '%' 
+        AND exercise > :currentId 
+        ORDER BY exercise ASC 
+        LIMIT 1
+    """)
+    suspend fun getNextUnresolvedExercise(levelPrefix: String, currentId: String): ExerciseEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(exercises: List<ExerciseEntity>)
 

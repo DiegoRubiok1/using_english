@@ -40,15 +40,28 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
     private val _currentExercise = MutableStateFlow<ExerciseEntity?>(null)
     val currentExercise: StateFlow<ExerciseEntity?> = _currentExercise.asStateFlow()
 
+    private val _nextExerciseId = MutableStateFlow<String?>(null)
+    val nextExerciseId: StateFlow<String?> = _nextExerciseId.asStateFlow()
+
     fun loadExercise(id: String) {
         viewModelScope.launch {
-            _currentExercise.value = repository.getExerciseById(id)
+            val exercise = repository.getExerciseById(id)
+            _currentExercise.value = exercise
+            _nextExerciseId.value = null 
+            
+            exercise?.let {
+                val levelPrefix = it.exercise.takeWhile { char -> char != '-' }
+                // Look specifically for the next unresolved exercise FORWARD in the list
+                val next = repository.getNextUnresolvedExercise(levelPrefix, it.exercise)
+                _nextExerciseId.value = next?.exercise
+            }
         }
     }
 
     fun submitAnswer(exercise: ExerciseEntity, answer: String) {
         viewModelScope.launch {
-            val isCorrect = answer.equals(exercise.solution, ignoreCase = true)
+            val solutions = exercise.solution.split("/").map { it.trim() }
+            val isCorrect = solutions.any { it.equals(answer.trim(), ignoreCase = true) }
             val updatedExercise = exercise.copy(
                 isResolved = isCorrect,
                 lastAttemptedAnswer = answer
@@ -56,11 +69,13 @@ class MainViewModel(private val repository: ExerciseRepository) : ViewModel() {
             repository.updateExercise(updatedExercise)
             
             if (isCorrect) {
-                // If newly resolved, we could update stats here too if needed, 
-                // but markExerciseAsResolved already does it.
-                // Let's use the existing repository method for consistency if we want to update stats.
                 repository.markExerciseAsResolved(updatedExercise)
             }
+            
+            val levelPrefix = exercise.exercise.takeWhile { char -> char != '-' }
+            // Always refresh based on current exercise position
+            val next = repository.getNextUnresolvedExercise(levelPrefix, exercise.exercise)
+            _nextExerciseId.value = next?.exercise
         }
     }
 
