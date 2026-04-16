@@ -1,4 +1,4 @@
-# Using English - C1 Preparation App
+# Using English - Preparation App
 
 Using English is a modern Android application designed to help prepare for the English.
 The app focuses on the "Use of English" section, providing interactive exercises and progress 
