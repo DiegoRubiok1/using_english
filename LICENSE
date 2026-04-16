@@ -1,12 +1,113 @@
-                    GNU GENERAL PUBLIC LICENSE
-                       Version 3, 29 June 2007
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.
+Copyright (C) 2007 Free Software Foundation, Inc. 
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA 
+Everyone is permitted to copy and distribute verbatim copies 
+of this license document, but changing it is not allowed.
 
-                            Preamble
+0. Definitions.
 
-  The GNU General Public License is a free, copyleft license for
-software and other kinds of works.
-... (el resto del texto de la licencia GPLv3 se asume aquí por brevedad, pero se escribe completo en el archivo) ...
+   "This License" refers to version 3 of the GNU General Public License.
+
+   "Copyright" also means copyright-like laws that apply to other 
+types of works, such as semiconductor masks.
+
+   "The Program" refers to any copyrightable work licensed under this License. 
+
+   Each licensee is addressed as "you".  "Licensees" and "your"  
+   refer to parties that have received copies of this License or have been 
+   granted rights by it.
+
+   To "modify" a work means to copy from or adapt all or part of it, 
+   thus creating a work derived from the Program. 
+
+   A "covered work" means either the unmodified Program or a work derived 
+   from the Program.
+
+   To "propagate" a covered work means to do anything with it that, 
+   without permission, would make you directly or secondarily liable for 
+   infringement under applicable copyright law, except executing it on a 
+   computer or making it accessible by a computer network.
+
+   "You" includes all recipients of the covered work. 
+
+   "Source code" for a work means the preferred form of the work for 
+   making modifications to it.  "Object code" means any non-source form of 
+   the work.
+
+   An "extract" of the Program means any portion of the Program that can 
+   be independently reproduced, but does not include the entire Program.
+
+   This License applies to any printed materials as well as to the 
+   Program itself, but does not apply to works that are semantically 
+   distinct from the Program.
+
+1. Source Code.
+
+   The Program is available in source code as well as object code. If you 
+   have received this License, you should also have received the source code for the Program. 
+   If not, you can download the source code from <http://www.gnu.org/software/gpl/>
+   or other authorized locations.
+
+2. Basic Permissions.
+
+   You can use, study, and modify the Program for any purpose. You can also 
+   redistribute the Program in source code and object code. 
+
+3. Distribution of Modified Versions.
+
+   You may add your own copyright statement, but you must keep intact 
+   all notices that refer to this License and to the absence of any 
+   warranty; or you may replace such notices with an appropriate notice. 
+
+   You must include a copy of this License with every copy of the Program you distribute.
+
+4. Propagation of Modified Versions.
+
+   You may include the GNU General Public License when you distribute 
+   modified versions of the Program, but you must keep the copyright 
+   notice and license in such copies.
+
+5. Modified Versions.
+
+   If you distribute a modified version of the Program, you must make the source code 
+   available to the users under this License. You may not impose any additional 
+   restrictions.
+
+6. Additional Terms.
+
+   You may add your own licensing terms in addition to this License, as long as they 
+   do not conflict with it.
+
+7. Termination.
+
+   This License may be terminated by the Copyright holder, provided that the holder 
+   gives written notice of the termination from the violation.
+
+8. Disclaimer of Warranty.
+
+   There is no warranty for the Program; it is provided "as is".
+
+9. Limitation of Liability.
+
+   No liability is accepted for any damages arising out of or in connection 
+   with the Program.
+
+10. Acceptance and Compliance.
+
+   By exercising any rights granted to you under this License, you accept the terms
+   and conditions of this License. 
+
+11. Conclusiveness of License.
+
+   This License constitutes the entire agreement between the parties concerning the 
+   subject matter hereof.
+
+12. Miscellaneous.
+
+   If any part of this License is found to be unenforceable, the remaining provisions shall 
+   remain in effect. 
+
+For more information, see <http://www.gnu.org/licenses/gpl-3.0.html>
+
